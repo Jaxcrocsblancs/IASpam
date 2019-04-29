@@ -12,8 +12,8 @@ public class Main {
 	private String[] tabWord;
 
 	private String pathDico = "dictionnaire1000en.txt";
-	private String pathSpam = "baseapp/ham";
-	private String pathHam  = "baseapp/spam";
+	private String pathSpam = "baseapp/ham/";
+	private String pathHam  = "baseapp/spam/";
 
 	
 	private int[] nbMotTousLesSpam;
@@ -21,22 +21,27 @@ public class Main {
 
 	private double[] probaMotSpam;
 	private double[] probaMotHam;
-
+	private double probaSpam;
+	private double probaHam;
+	
 	private  static int epsilon=1;
 	
 	public Main(){
 		System.out.println("debut");
 		charger_dictionnaire();
-		boolean[] nb = lire_message("baseapp/ham/0.txt");
+		apprentissage(499, 499);
+		test(499,499);
 		
-		for(int i = 0; i<nb.length; i++){
-			if(nb[i]){
-				System.out.print("1 ");
-			}
-			else{
-				System.out.print("0 ");
-			}
-		}
+		
+		
+		
+		//boolean[] nb = lire_message("baseapp/ham/0.txt");
+		/*System.out.println("fin1");
+		System.out.println(probaMotSpam.length);
+		for(int i = 0; i<probaMotSpam.length; i++){
+			System.out.print(probaMotSpam[i]+" ");
+			System.out.println(probaMotHam[i]+" ");
+		}*/
 		System.out.println("fin");
 	}
 	
@@ -89,7 +94,7 @@ public class Main {
 					}
 					//Test si mots dans dico
 					String mot = ligne.substring(MemIndex, index);
-					System.out.println(mot);
+					//System.out.println(mot);
 					for(int i=0; i<tabWord.length; i++){
 						if(mot.equalsIgnoreCase(tabWord[i])){
 							nb[i]=true;
@@ -109,7 +114,8 @@ public class Main {
 
 
 	void apprentissage(int nbSpam, int nbHam){
-
+		System.out.println("Apprentissage...");
+		
 		//On initialise les tableaux avec la taille du dictionnaire
 		nbMotTousLesSpam=new int[this.tabWord.length];
 		nbMotTousLesHam=new int[this.tabWord.length];
@@ -117,16 +123,11 @@ public class Main {
 		probaMotSpam=new double[this.tabWord.length];
 		probaMotHam=new double[this.tabWord.length];
 
-		//Pour tester
-		String rootPath="baseapp/";
-
-		String spamPath=rootPath+="spam/";
-		String hamPath=rootPath+="ham/";
 
 		//On parcourt tous les spam
 		//On compte pour chaque mot du dictionnaire combien de fois il apparait dans tous les spams
 		for (int i=0;i<nbSpam;i++) {
-			boolean[] presence=lire_message(spamPath+i+".txt");
+			boolean[] presence=lire_message(pathSpam+i+".txt");
 			for(int j=0;j<tabWord.length;j++) {
 				//Si le mot est dans le dictionnaire alors on augmente le compteur de spam pour ce mot
 				if (presence[j]) {
@@ -137,7 +138,7 @@ public class Main {
 
 		//On compte pour chaque mot du dictionnaire combien de fois il apparait dans tous les ham
 		for (int i=0;i<nbHam;i++) {
-			boolean[] presence=lire_message(hamPath+i+".txt");
+			boolean[] presence=lire_message(pathHam+i+".txt");
 			for(int j=0;j<tabWord.length;j++) {
 				//Si le mot est dans le dictionnaire alors on augmente le compteur de ham pour ce mot
 				if (presence[j]) {
@@ -155,7 +156,9 @@ public class Main {
 		for (int i=0; i<tabWord.length; i++) {
 			probaMotHam[i] = (1.0*nbMotTousLesHam[i]+epsilon)/(nbHam+2*epsilon);
 		}
-
+		this.probaSpam = ((double)nbSpam) / ((double)(nbHam + nbSpam));
+		this.probaHam = 1. - probaSpam;
+		System.out.println("fin apprentissage");
 	}
 	
 	boolean identification(boolean[] tabPresence){
@@ -163,13 +166,15 @@ public class Main {
 		//Calcul P(Y=SPAM|X=x) 
 		double PSpam=0;
 		//1/P(X=x)
-		PSpam = Math.log(0 ) ;
+		
+		
+		PSpam = Math.log(probaSpam) ;
 		for(int i=0;i<tabPresence.length;i++){
 			//P(Y=SPAM)∏dj=1(bjSPAM)xj(1−bjSPAM)1−xj
 			if(tabPresence[i]){
-				PSpam+=Math.log(probaPresenceMotSPAM[j]);
+				PSpam+=Math.log(probaMotSpam[i]);
 			}else{
-				PSpam+=Math.log(1.-probaPresenceMotSPAM[j]);
+				PSpam+=Math.log(1.-probaMotSpam[i]);
 			}
 		}
 		
@@ -177,16 +182,15 @@ public class Main {
 		//Calcul P(Y=HAM|X=x) 
 		double PHam=0;
 		//1/P(X=x)
-		PHam=Math.log(0);
+		PHam=Math.log(probaHam);
 		for(int i=0;i<tabPresence.length;i++){
 			//P(Y=HAM)∏dj=1(bjHAM)xj(1−bjHAM)1−xj
 			if(tabPresence[i]){
-				PHam+=Math.log(probaPresenceMotHAM[j]);
+				PHam+=Math.log(probaMotHam[i]);
 			}else{
-				PHam+=Math.log(1.-probaPresenceMotHAM[j]);
+				PHam+=Math.log(1.-probaMotHam[i]);
 			}
 		}
-		
 		if(PSpam<PHam){
 			return false;
 		}else{
