@@ -14,6 +14,15 @@ public class Main {
 	private String pathDico = "dictionnaire1000en.txt";
 	private String pathSpam = "baseapp/ham";
 	private String pathHam  = "baseapp/spam";
+
+	
+	private int[] nbMotTousLesSpam;
+	private int[] nbMotTousLesHam;
+
+	private double[] probaMotSpam;
+	private double[] probaMotHam;
+
+	private  static int epsilon=1;
 	
 	public Main(){
 		System.out.println("debut");
@@ -97,12 +106,56 @@ public class Main {
 			}
 		return nb;
 	}
-	
+
+
 	void apprentissage(int nbSpam, int nbHam){
-		
-		
-		
-		
+
+		//On initialise les tableaux avec la taille du dictionnaire
+		nbMotTousLesSpam=new int[this.tabWord.length];
+		nbMotTousLesHam=new int[this.tabWord.length];
+
+		probaMotSpam=new double[this.tabWord.length];
+		probaMotHam=new double[this.tabWord.length];
+
+		//Pour tester
+		String rootPath="baseapp/";
+
+		String spamPath=rootPath+="spam/";
+		String hamPath=rootPath+="ham/";
+
+		//On parcourt tous les spam
+		//On compte pour chaque mot du dictionnaire combien de fois il apparait dans tous les spams
+		for (int i=0;i<nbSpam;i++) {
+			boolean[] presence=lire_message(spamPath+i+".txt");
+			for(int j=0;j<tabWord.length;j++) {
+				//Si le mot est dans le dictionnaire alors on augmente le compteur de spam pour ce mot
+				if (presence[j]) {
+				 	nbMotTousLesSpam[j]++;
+				 }
+			}
+		}
+
+		//On compte pour chaque mot du dictionnaire combien de fois il apparait dans tous les ham
+		for (int i=0;i<nbHam;i++) {
+			boolean[] presence=lire_message(hamPath+i+".txt");
+			for(int j=0;j<tabWord.length;j++) {
+				//Si le mot est dans le dictionnaire alors on augmente le compteur de ham pour ce mot
+				if (presence[j]) {
+					nbMotTousLesHam[j]++;
+				}
+			}
+		}
+
+		//On calcule les probabilités pour chaque mot spam
+		for (int i=0; i<tabWord.length; i++) {
+			probaMotSpam[i] = (1.0*nbMotTousLesSpam[i]+epsilon)/(nbSpam+2*epsilon);
+		}
+
+		//On calcule les probabilités pour chaque mot ham
+		for (int i=0; i<tabWord.length; i++) {
+			probaMotHam[i] = (1.0*nbMotTousLesHam[i]+epsilon)/(nbHam+2*epsilon);
+		}
+
 	}
 	
 	boolean identification(boolean[] tabPresence){
