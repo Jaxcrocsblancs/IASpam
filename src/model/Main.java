@@ -12,7 +12,13 @@ public class Main {
 
 	private String pathDico = "dictionnaire1000en.txt";
 	
-	
+	private int[] nbMotTousLesSpam;
+	private int[] nbMotTousLesHam;
+
+	private double[] probaMotSpam;
+	private double[] probaMotHam;
+
+	private  static int epsilon=1;
 	
 	public Main(){
 		System.out.println("debut");
@@ -29,7 +35,7 @@ public class Main {
 		System.out.println("fin");
 	}
 	
-	// cette fonction doit pouvoir charger un dictionnaire (parexemple dans un tableau de mots) à partir d’un fichier texte
+	// cette fonction doit pouvoir charger un dictionnaire (parexemple dans un tableau de mots) ï¿½ partir dï¿½un fichier texte
 	public void charger_dictionnaire ( ){
 		try{
 			InputStream flux=new FileInputStream(new File(pathDico)); 
@@ -55,7 +61,7 @@ public class Main {
 	
 	
 	/*  cette fonction doit pouvoir lire un message (dans un fichier texte) et le traduire en 
-	 une représentation sous forme de vecteur binaire x à partir d’un dictionnaire. */
+	 une reprï¿½sentation sous forme de vecteur binaire x ï¿½ partir dï¿½un dictionnaire. */
 	private int[] lire_message(String path){
 		 int[] nb = new int[tabWord.length];
 		try{
@@ -95,9 +101,54 @@ public class Main {
 			}
 		return nb;
 	}
-	
-	void apprentissage(){
-		
+
+	void apprentissage(int nbSpam, int nbHam){
+
+		//On initialise les tableaux avec la taille du dictionnaire
+		nbMotTousLesSpam=new int[this.tabWord.length];
+		nbMotTousLesHam=new int[this.tabWord.length];
+
+		probaMotSpam=new double[this.tabWord.length];
+		probaMotHam=new double[this.tabWord.length];
+
+		//Pour tester
+		String rootPath="baseapp/";
+
+		String spamPath=rootPath+="spam/";
+		String hamPath=rootPath+="ham/";
+
+		//On parcourt tous les spam
+		//On compte pour chaque mot du dictionnaire combien de fois il apparait dans tous les spams
+		for (int i=0;i<nbSpam;i++) {
+			boolean[] presence=lire_message(spamPath+i+".txt");
+			for(int j=0;j<tabWord.length;j++) {
+				//Si le mot est dans le dictionnaire alors on augmente le compteur de spam pour ce mot
+				if (presence[j]) {
+				 	nbMotTousLesSpam[j]++;
+				 }
+			}
+		}
+
+		//On compte pour chaque mot du dictionnaire combien de fois il apparait dans tous les ham
+		for (int i=0;i<nbHam;i++) {
+			boolean[] presence=lire_message(hamPath+i+".txt");
+			for(int j=0;j<tabWord.length;j++) {
+				//Si le mot est dans le dictionnaire alors on augmente le compteur de ham pour ce mot
+				if (presence[j]) {
+					nbMotTousLesHam[j]++;
+				}
+			}
+		}
+
+		//On calcule les probabilitÃ©s pour chaque mot spam
+		for (int i=0; i<tabWord.length; i++) {
+			probaMotSpam[i] = (1.0*nbMotTousLesSpam[i]+epsilon)/(nbSpam+2*epsilon);
+		}
+
+		//On calcule les probabilitÃ©s pour chaque mot ham
+		for (int i=0; i<tabWord.length; i++) {
+			probaMotHam[i] = (1.0*nbMotTousLesHam[i]+epsilon)/(nbHam+2*epsilon);
+		}
 	}
 	
 	void test(){
