@@ -12,9 +12,10 @@ public class Main {
 	private String[] tabWord;
 
 	private String pathDico = "dictionnaire1000en.txt";
-	private String pathSpam = "baseapp/ham/";
-	private String pathHam  = "baseapp/spam/";
-
+	private String pathSpam = "baseapp/spam/";
+	private String pathHam  = "baseapp/ham/";
+	private String pathSpamT = "basetest/spam/";
+	private String pathHamT  = "basetest/ham/";
 	
 	private int[] nbMotTousLesSpam;
 	private int[] nbMotTousLesHam;
@@ -29,7 +30,7 @@ public class Main {
 	public Main(){
 		System.out.println("debut");
 		charger_dictionnaire();
-		apprentissage(499, 499);
+		apprentissage(499, 2499);
 		test(499,499);
 		
 		
@@ -138,6 +139,7 @@ public class Main {
 
 		//On compte pour chaque mot du dictionnaire combien de fois il apparait dans tous les ham
 		for (int i=0;i<nbHam;i++) {
+			
 			boolean[] presence=lire_message(pathHam+i+".txt");
 			for(int j=0;j<tabWord.length;j++) {
 				//Si le mot est dans le dictionnaire alors on augmente le compteur de ham pour ce mot
@@ -166,9 +168,7 @@ public class Main {
 		//Calcul P(Y=SPAM|X=x) 
 		double PSpam=0;
 		//1/P(X=x)
-		
-		
-		PSpam = Math.log(probaSpam) ;
+		PSpam = Math.log(1/probaSpam) ;
 		for(int i=0;i<tabPresence.length;i++){
 			//P(Y=SPAM)∏dj=1(bjSPAM)xj(1−bjSPAM)1−xj
 			if(tabPresence[i]){
@@ -182,7 +182,7 @@ public class Main {
 		//Calcul P(Y=HAM|X=x) 
 		double PHam=0;
 		//1/P(X=x)
-		PHam=Math.log(probaHam);
+		PHam=Math.log(1/probaHam);
 		for(int i=0;i<tabPresence.length;i++){
 			//P(Y=HAM)∏dj=1(bjHAM)xj(1−bjHAM)1−xj
 			if(tabPresence[i]){
@@ -205,7 +205,7 @@ public class Main {
 		int erreurSpam=0;
 		boolean[] tabPresence;
 		for(int i=0;i<nbSpam;i++){
-			tabPresence = lire_message(pathSpam+i+".txt");
+			tabPresence = lire_message(pathSpamT+i+".txt");
 			if(identification(tabPresence)){
 				System.out.println("SPAM numéro "+i+" identifié comme un SPAM");
 			}else{
@@ -215,8 +215,9 @@ public class Main {
 		}
 		//TEST des HAM
 		int erreurHam=0;
+		
 		for(int i=0;i<nbHam;i++){
-			tabPresence = lire_message(pathHam+i+".txt");
+			tabPresence = lire_message(pathHamT+i+".txt");
 			if(identification(tabPresence)){
 				System.out.println("HAM numéro "+i+" identifié comme un SPAM ***erreur***");
 				erreurHam++;
@@ -224,12 +225,12 @@ public class Main {
 				System.out.println("HAM numéro "+i+" identifié comme un HAM");
 			}
 		}
-		int nbSpamHamTotal=nbSpam+nbHam;
+		int nbSpamHamTotal=nbSpam+1+nbHam+1;
 		int errTotal=erreurHam+erreurSpam;
 		
-		System.out.println("Erreur de test sur les "+nbSpam+" SPAM : "+((double)erreurSpam/nbSpam)*100);
-		System.out.println("Erreur de test sur les "+nbHam+" HAM : "+((double)erreurHam/nbHam)*100);
-		System.out.println("Erreur de test globals sur "+nbSpamHamTotal+" mails : "+((double)errTotal/nbSpamHamTotal)*100);
+		System.out.println("Erreurs de test sur les "+(nbSpam+1)+" SPAM : "+((double)erreurSpam/nbSpam)*100);
+		System.out.println("Erreurs de test sur les "+(nbHam+1)+" HAM : "+((double)erreurHam/nbHam)*100);
+		System.out.println("Erreurs de test globals sur "+nbSpamHamTotal+" mails : "+((double)errTotal/nbSpamHamTotal)*100);
 		
 	}
 
