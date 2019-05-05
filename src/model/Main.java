@@ -7,26 +7,54 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
+/**
+ * Classe principale qui va gérer l'apprentissage et le test
+ */
 public class Main {
-	
+
+
+	/** Le dictionnaire (tableau de String contenant 10000 mot anglais) **/
 	private String[] tabWord;
 
+	/** Le chemin du dictionnaire contenant **/
 	private String pathDico = "dictionnaire1000en.txt";
+
+	/** Le chemin des spams de la base d'apprentissage **/
 	private String pathSpam = "baseapp/spam/";
+
+	/** Le chemin des hams de la base d'apprentissage **/
 	private String pathHam  = "baseapp/ham/";
+
+	/** Le chemin des spams de la base de test **/
 	private String pathSpamT = "basetest/spam/";
+
+	/** Le chemin des hams de la base de test **/
 	private String pathHamT  = "basetest/ham/";
-	
+
+	/** Le compteur utilisé par un mail pour chaque mot du dictionnaire dans les spams **/
 	private int[] nbMotTousLesSpam;
+
+	/** Le compteur utilisé par un mail pour chaque mot du dictionnaire dans les hams **/
 	private int[] nbMotTousLesHam;
 
+	/** La probabilité que le mot en question soit un mot plutot utilisé dans les spams **/
 	private double[] probaMotSpam;
+
+	/** La probabilité que le mot en question soit un mot plutot utilisé dans les hams **/
 	private double[] probaMotHam;
+
+	/** La probabilité initiale que un mail donné soit un spam (à priori tel un classifieur simpliste (comme ZeroR)) **/
 	private double probaSpam;
+
+	/** La probabilité initiale que un mail donné soit un ham (à priori tel un classifieur simpliste (comme ZeroR)) **/
 	private double probaHam;
-	
+
+	/** Hyper paramètre du classifieur **/
 	private  static int epsilon=1;
-	
+
+	/**
+	 * Fonction principale faisant un apprentissage et un test tout de suite après
+	 */
 	public Main(){
 		System.out.println("debut");
 		charger_dictionnaire();
@@ -46,7 +74,11 @@ public class Main {
 		System.out.println("fin");
 	}
 	
-	// cette fonction doit pouvoir charger un dictionnaire (parexemple dans un tableau de mots) à partir d’un fichier texte
+	//
+
+	/**
+	 * Cette fonction charge un dictionnaire dans tabword
+	 */
 	public void charger_dictionnaire ( ){
 		try{
 			ArrayList<String> listWord = new ArrayList<String>(); 
@@ -68,13 +100,14 @@ public class Main {
 			System.out.println(e.toString());
 			}
 		
-		System.out.println("Dictionnaire charger");
+		System.out.println("Dictionnaire chargé");
 	}
-	
-	
-	
-	/*  cette fonction doit pouvoir lire un message (dans un fichier texte) et le traduire en 
-	 une représentation sous forme de vecteur binaire x à partir d’un dictionnaire. */
+
+	/**
+	 * Cette fonction lit un message et retourne un tableau correspondant à la présence des mots dans le dictionnaire
+	 * @param path Un string qui contient le chemin d'accès vers le message
+	 * @return Un tableau booléen de la meme taille du dictionnaire corrsepondant à la présence des mots dans le message
+	 */
 	private boolean[] lire_message(String path){
 		boolean[] nb = new boolean[tabWord.length];
 		try{
@@ -114,6 +147,11 @@ public class Main {
 	}
 
 
+	/**
+	 * Cette fonction réalise l'apprentissage pour un nombre de spam et de ham défini
+	 * @param nbSpam Le nombre de spam
+	 * @param nbHam Le nombre de ham
+	 */
 	void apprentissage(int nbSpam, int nbHam){
 		System.out.println("Apprentissage...");
 		
@@ -162,7 +200,12 @@ public class Main {
 		this.probaHam = 1. - probaSpam;
 		System.out.println("fin apprentissage");
 	}
-	
+
+	/**
+	 * Fonction qui va permmettre grace aux probabilités conditionnelles de déterminer si un mail est probablement un spam ou non
+	 * @param tabPresence Un tableau booléen indiquant la présence de chaque mot
+	 * @return Un booléen retournant vrai si c'est on identifie le message comme un spam et faux sinon
+	 */
 	boolean identification(boolean[] tabPresence){
 		// Calcul des probabilités a posteriori
 		//Calcul P(Y=SPAM|X=x) 
@@ -197,8 +240,12 @@ public class Main {
 			return true;
 		}
 	}
-	
-	
+
+	/**
+	 * Fonction qui réalise et affiche le test sur un nombre de ham et spam déterminé
+	 * @param nbSpam Le nombre de spam
+	 * @param nbHam Le nombre de ham
+	 */
 	void test(int nbSpam, int nbHam){
 		System.out.println("TEST :");
 		//TEST des SPAM
@@ -234,6 +281,10 @@ public class Main {
 		
 	}
 
+	/**
+	 * Fonction pricncipale qui crée un Main (effectue apprentissage + test)
+	 * @param args Un tableau de String correspondant aux paramètres de la ligne de commande
+	 */
 	public static void main(String[] args) {
 		new Main();
 		
