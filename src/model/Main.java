@@ -30,24 +30,13 @@ public class Main {
 	public Main(){
 		System.out.println("debut");
 		charger_dictionnaire();
-		apprentissage(499, 2499);
-		test(499,499);
-		
-		
-		
-		
-		//boolean[] nb = lire_message("baseapp/ham/0.txt");
-		/*System.out.println("fin1");
-		System.out.println(probaMotSpam.length);
-		for(int i = 0; i<probaMotSpam.length; i++){
-			System.out.print(probaMotSpam[i]+" ");
-			System.out.println(probaMotHam[i]+" ");
-		}*/
+		apprentissage(200, 200);
+		test(100,200);
 		System.out.println("fin");
 	}
 	
 	// cette fonction doit pouvoir charger un dictionnaire (parexemple dans un tableau de mots) à partir d’un fichier texte
-	public void charger_dictionnaire ( ){
+	public void charger_dictionnaire(){
 		try{
 			ArrayList<String> listWord = new ArrayList<String>(); 
 			InputStream flux=new FileInputStream(new File(pathDico)); 
@@ -61,7 +50,6 @@ public class Main {
 			}
 			tabWord = new String[listWord.size()];
 			listWord.toArray(tabWord);
-			
 			buff.close(); 
 			}		
 			catch (Exception e){
@@ -177,8 +165,6 @@ public class Main {
 				PSpam+=Math.log(1.-probaMotSpam[i]);
 			}
 		}
-		
-		
 		//Calcul P(Y=HAM|X=x) 
 		double PHam=0;
 		//1/P(X=x)
@@ -197,7 +183,6 @@ public class Main {
 			return true;
 		}
 	}
-	
 	
 	void test(int nbSpam, int nbHam){
 		System.out.println("TEST :");
@@ -225,11 +210,11 @@ public class Main {
 				System.out.println("HAM numéro "+i+" identifié comme un HAM");
 			}
 		}
-		int nbSpamHamTotal=nbSpam+1+nbHam+1;
+		int nbSpamHamTotal=nbSpam+nbHam;
 		int errTotal=erreurHam+erreurSpam;
 		
-		System.out.println("Erreurs de test sur les "+(nbSpam+1)+" SPAM : "+((double)erreurSpam/nbSpam)*100);
-		System.out.println("Erreurs de test sur les "+(nbHam+1)+" HAM : "+((double)erreurHam/nbHam)*100);
+		System.out.println("Erreurs de test sur les "+nbSpam+" SPAM : "+((double)erreurSpam/nbSpam)*100);
+		System.out.println("Erreurs de test sur les "+nbHam+" HAM : "+((double)erreurHam/nbHam)*100);
 		System.out.println("Erreurs de test globals sur "+nbSpamHamTotal+" mails : "+((double)errTotal/nbSpamHamTotal)*100);
 		
 	}
