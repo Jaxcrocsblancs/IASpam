@@ -1,16 +1,12 @@
 package model;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.ArrayList;
 
 /**
  * Classe principale qui va gérer l'apprentissage et le test
  */
-public class Main {
+public class Main implements Serializable {
 
 
 	/** Le dictionnaire (tableau de String contenant 10000 mot anglais) **/
@@ -56,14 +52,17 @@ public class Main {
 	 * Fonction principale faisant un apprentissage et un test tout de suite après
 	 */
 	public Main(){
-		System.out.println("debut");
 		charger_dictionnaire();
-		apprentissage(499, 2499);
-		test(499,499);
-		
-		
-		
-		
+		/*apprentissage(nbSpam, 2499);
+
+		if (testNb == -1) {
+			test(nbSpam,nbHam);
+		}*/
+
+
+
+
+
 		//boolean[] nb = lire_message("baseapp/ham/0.txt");
 		/*System.out.println("fin1");
 		System.out.println(probaMotSpam.length);
@@ -71,9 +70,7 @@ public class Main {
 			System.out.print(probaMotSpam[i]+" ");
 			System.out.println(probaMotHam[i]+" ");
 		}*/
-		System.out.println("fin");
 	}
-	
 	//
 
 	/**
@@ -286,8 +283,87 @@ public class Main {
 	 * @param args Un tableau de String correspondant aux paramètres de la ligne de commande
 	 */
 	public static void main(String[] args) {
-		new Main();
-		
+		System.out.println("debut");
 
+		boolean sauvegarde=false;
+		boolean chargement=false;
+
+		String nomClassifieurSauvegarde="";
+		String nomClassifieurChargement="";
+
+		//499 par défaut
+		int nbSpam=499;
+		int nbHam=499;
+
+		//int testNumber=-1;
+
+		Main classifieur=null;
+
+		for (int i=0;i<args.length;i++) {
+			if (args[i].equals("-save") && (args.length > i+1)) {
+				sauvegarde=true;
+				nomClassifieurSauvegarde=args[i+1];
+			} else if (args[i].equals("-load") && (args.length > i+1)) {
+				chargement=true;
+				nomClassifieurChargement=args[i+1];
+			} else if (args[i].equals("-nbSpam") && (args.length > i+1)) {
+				nbSpam=Integer.parseInt(args[i+1]);
+			} else if (args[i].equals("-nbHam") && (args.length > i+1)) {
+				nbHam=Integer.parseInt(args[i+1]);
+			} /*else if (args[i].equals("-testNb") && (args.length > i+1)) {
+				testNumber=Integer.parseInt(args[i+1]);
+			}*/
+		}
+
+		if (sauvegarde) {
+			classifieur=new Main();
+			classifieur.apprentissage(nbSpam, nbHam);
+			sauvegarde(classifieur,nomClassifieurSauvegarde);
+			//classifieur.test(nbSpam,nbHam);
+		} else if (chargement) {
+			classifieur=chargement(nomClassifieurChargement);
+			classifieur.test(nbSpam,nbHam);
+		}
+
+		System.out.println("fin");
+	}
+
+	/**
+	 * Sauvegarde un classifieur dans un fichier
+	 * @param classifieur Le classifieur à sauvegarder
+	 * @param nomClassifieur Le nom du fichier utilisé pour la sauvegarde
+	 */
+	public static void sauvegarde(Main classifieur, String nomClassifieur) {
+		try {
+			FileOutputStream fichierSortie = new FileOutputStream(nomClassifieur);
+			ObjectOutputStream oos = new ObjectOutputStream(fichierSortie);
+			oos.writeObject(classifieur);
+			oos.close();
+			fichierSortie.close();
+			System.out.println("Le classififeur a été sauvegardé");
+		} catch (IOException i) {
+			i.printStackTrace();
+			System.out.println("Il y a eu un problème lors de la sauvegarde");
+		}
+	}
+
+	/**
+	 * Charge un classifieur dans un fichier
+	 * @param nomClassifieur Le classifieur à sauvegarder
+	 * @return Le classifieur de type Main
+	 */
+	public  static Main chargement(String nomClassifieur) {
+		Main classifieur = null;
+		try {
+			FileInputStream fichierEntree = new FileInputStream(nomClassifieur);
+			ObjectInputStream ois = new ObjectInputStream(fichierEntree);
+			classifieur = (Main) ois.readObject();
+			ois.close();
+			fichierEntree.close();
+		} catch (Exception e) {
+			System.out.println("Erreur lors du chargement");
+			return null;
+		}
+		return classifieur;
 	}
 }
