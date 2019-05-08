@@ -229,7 +229,7 @@ public class Main implements Serializable {
 			}
 		}
 		
-		System.out.println("P(Y=SPAM | X=x) = "+Math.pow(10, PSpam)+", P(Y=HAM | X=x) = "+ Math.pow(10, PHam)+" ");
+		System.out.println("P(Y=SPAM | X=x) = "+Math.exp(PSpam)+", P(Y=HAM | X=x) = "+ Math.exp(PHam)+" ");
 		
 		if(PSpam<PHam){
 			return false;
@@ -262,7 +262,7 @@ public class Main implements Serializable {
 		
 		for(int i=0;i<nbHam;i++){
 			tabPresence = lire_message(pathHamT+i+".txt");
-			System.out.println("HAM numéro "+i+" :");
+			System.out.print("HAM numéro "+i+" :");
 			if(identification(tabPresence)){
 				System.out.println("		=> identifié comme un SPAM ***erreur***");
 				erreurHam++;
@@ -302,19 +302,17 @@ public class Main implements Serializable {
 		System.out.println("debut");
 
 		boolean sauvegarde=false;
-
 		boolean chargement=false;
 		boolean testAll=true;
 
 		String nomClassifieurSauvegarde="aze.txt";
 		String nomClassifieurChargement="aze.txt";
 
-		//499 par défaut
-		int nbSpam=499;
-		int nbHam=499;
+		//500 par défaut
+		int nbSpam=500;
+		int nbHam=500;
 
 		String testFile=null;
-
 		Main classifieur=null;
 
 		for (int i=0;i<args.length;i++) {
