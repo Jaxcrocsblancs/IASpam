@@ -1,4 +1,4 @@
-package model;
+﻿package model;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -90,7 +90,6 @@ public class Main implements Serializable {
 			}
 			tabWord = new String[listWord.size()];
 			listWord.toArray(tabWord);
-			
 			buff.close(); 
 			}		
 			catch (Exception e){
@@ -217,8 +216,6 @@ public class Main implements Serializable {
 				PSpam+=Math.log(1.-probaMotSpam[i]);
 			}
 		}
-		
-		
 		//Calcul P(Y=HAM|X=x) 
 		double PHam=0;
 		//1/P(X=x)
@@ -231,13 +228,15 @@ public class Main implements Serializable {
 				PHam+=Math.log(1.-probaMotHam[i]);
 			}
 		}
+		
+		System.out.println("P(Y=SPAM | X=x) = "+Math.exp(PSpam)+", P(Y=HAM | X=x) = "+ Math.exp(PHam)+" ");
+		
 		if(PSpam<PHam){
 			return false;
 		}else{
 			return true;
 		}
 	}
-
 	/**
 	 * Fonction qui réalise et affiche le test sur un nombre de ham et spam déterminé
 	 * @param nbSpam Le nombre de spam
@@ -250,10 +249,11 @@ public class Main implements Serializable {
 		boolean[] tabPresence;
 		for(int i=0;i<nbSpam;i++){
 			tabPresence = lire_message(pathSpamT+i+".txt");
+			System.out.print("SPAM numéro "+i+":");
 			if(identification(tabPresence)){
-				System.out.println("SPAM numéro "+i+" identifié comme un SPAM");
+				System.out.println("		=> identifié comme un SPAM");
 			}else{
-				System.out.println("SPAM numéro "+i+" identifié comme un HAM  ***erreur***");
+				System.out.println("		=> identifié comme un HAM  ***erreur***");
 				erreurSpam++;
 			}
 		}
@@ -262,18 +262,20 @@ public class Main implements Serializable {
 		
 		for(int i=0;i<nbHam;i++){
 			tabPresence = lire_message(pathHamT+i+".txt");
+			System.out.print("HAM numéro "+i+" :");
 			if(identification(tabPresence)){
-				System.out.println("HAM numéro "+i+" identifié comme un SPAM ***erreur***");
+				System.out.println("		=> identifié comme un SPAM ***erreur***");
 				erreurHam++;
-			} else{
-				System.out.println("HAM numéro "+i+" identifié comme un HAM");
+			}else{
+				System.out.println("		=> identifié comme un HAM");
+
 			}
 		}
-		int nbSpamHamTotal=nbSpam+1+nbHam+1;
+		int nbSpamHamTotal=nbSpam+nbHam;
 		int errTotal=erreurHam+erreurSpam;
 		
-		System.out.println("Erreurs de test sur les "+(nbSpam+1)+" SPAM : "+((double)erreurSpam/nbSpam)*100);
-		System.out.println("Erreurs de test sur les "+(nbHam+1)+" HAM : "+((double)erreurHam/nbHam)*100);
+		System.out.println("Erreurs de test sur les "+nbSpam+" SPAM : "+((double)erreurSpam/nbSpam)*100);
+		System.out.println("Erreurs de test sur les "+nbHam+" HAM : "+((double)erreurHam/nbHam)*100);
 		System.out.println("Erreurs de test globals sur "+nbSpamHamTotal+" mails : "+((double)errTotal/nbSpamHamTotal)*100);
 		
 	}
@@ -303,15 +305,14 @@ public class Main implements Serializable {
 		boolean chargement=false;
 		boolean testAll=true;
 
-		String nomClassifieurSauvegarde="";
-		String nomClassifieurChargement="";
+		String nomClassifieurSauvegarde="aze.txt";
+		String nomClassifieurChargement="aze.txt";
 
-		//499 par défaut
-		int nbSpam=499;
-		int nbHam=499;
+		//500 par défaut
+		int nbSpam=500;
+		int nbHam=500;
 
 		String testFile=null;
-
 		Main classifieur=null;
 
 		for (int i=0;i<args.length;i++) {
