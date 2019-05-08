@@ -1,0 +1,24 @@
+<project name="Classifieur" basedir="." default="run">
+  <target name="clean">
+    <delete dir="ant-out"/>
+  </target>
+  
+  <target name="compile" depends="clean">
+    <mkdir dir="ant-out"/>
+    <javac includeantruntime="false" srcdir="src" destdir="ant-out" encoding="UTF-8">
+    </javac>
+  </target>
+  
+  <target name="jar" depends="compile">
+    <jar destfile="Classifieur.jar" basedir="ant-out">
+      <manifest>
+        <attribute name="main-Class" value="model.Main"/>
+      </manifest>
+    </jar>
+  </target>
+  
+  <target name="run" depends="jar">
+    <java jar="Classifieur.jar" fork="true"/>
+  </target>
+  
+</project>
