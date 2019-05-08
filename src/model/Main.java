@@ -228,6 +228,9 @@ public class Main implements Serializable {
 				PHam+=Math.log(1.-probaMotHam[i]);
 			}
 		}
+		
+		System.out.println("P(Y=SPAM | X=x) = "+Math.pow(10, PSpam)+", P(Y=HAM | X=x) = "+ Math.pow(10, PHam)+" ");
+		
 		if(PSpam<PHam){
 			return false;
 		}else{
@@ -246,10 +249,11 @@ public class Main implements Serializable {
 		boolean[] tabPresence;
 		for(int i=0;i<nbSpam;i++){
 			tabPresence = lire_message(pathSpamT+i+".txt");
+			System.out.print("SPAM numéro "+i+":");
 			if(identification(tabPresence)){
-				System.out.println("SPAM numéro "+i+" identifié comme un SPAM");
+				System.out.println("		=> identifié comme un SPAM");
 			}else{
-				System.out.println("SPAM numéro "+i+" identifié comme un HAM  ***erreur***");
+				System.out.println("		=> identifié comme un HAM  ***erreur***");
 				erreurSpam++;
 			}
 		}
@@ -258,11 +262,12 @@ public class Main implements Serializable {
 		
 		for(int i=0;i<nbHam;i++){
 			tabPresence = lire_message(pathHamT+i+".txt");
+			System.out.println("HAM numéro "+i+" :");
 			if(identification(tabPresence)){
-				System.out.println("HAM numéro "+i+" identifié comme un SPAM ***erreur***");
+				System.out.println("		=> identifié comme un SPAM ***erreur***");
 				erreurHam++;
 			}else{
-				System.out.println("HAM numéro "+i+" identifié comme un HAM");
+				System.out.println("		=> identifié comme un HAM");
 			}
 		}
 		int nbSpamHamTotal=nbSpam+nbHam;
@@ -282,10 +287,10 @@ public class Main implements Serializable {
 		System.out.println("debut");
 
 		boolean sauvegarde=false;
-		boolean chargement=false;
+		boolean chargement=true;
 
-		String nomClassifieurSauvegarde="";
-		String nomClassifieurChargement="";
+		String nomClassifieurSauvegarde="aze.txt";
+		String nomClassifieurChargement="aze.txt";
 
 		//499 par défaut
 		int nbSpam=499;
