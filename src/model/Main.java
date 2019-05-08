@@ -268,6 +268,7 @@ public class Main implements Serializable {
 				erreurHam++;
 			}else{
 				System.out.println("		=> identifié comme un HAM");
+
 			}
 		}
 		int nbSpamHamTotal=nbSpam+nbHam;
@@ -280,6 +281,20 @@ public class Main implements Serializable {
 	}
 
 	/**
+	 * Fonction qui réalise et affiche le test sur un fichier fourni
+	 * @param fichierATester Le nom du fichier à tester
+	 */
+	void test(String fichierATester) {
+		boolean[] tabPresence;
+		tabPresence = lire_message(fichierATester);
+		if(identification(tabPresence)){
+			System.out.println("Fichier "+fichierATester+" identifié comme un SPAM");
+		} else{
+			System.out.println("Fichier "+fichierATester+" identifié comme un HAM ");
+		}
+	}
+
+	/**
 	 * Fonction pricncipale qui crée un Main (effectue apprentissage + test)
 	 * @param args Un tableau de String correspondant aux paramètres de la ligne de commande
 	 */
@@ -287,7 +302,9 @@ public class Main implements Serializable {
 		System.out.println("debut");
 
 		boolean sauvegarde=false;
-		boolean chargement=true;
+
+		boolean chargement=false;
+		boolean testAll=true;
 
 		String nomClassifieurSauvegarde="aze.txt";
 		String nomClassifieurChargement="aze.txt";
@@ -296,7 +313,7 @@ public class Main implements Serializable {
 		int nbSpam=499;
 		int nbHam=499;
 
-		//int testNumber=-1;
+		String testFile=null;
 
 		Main classifieur=null;
 
@@ -311,20 +328,31 @@ public class Main implements Serializable {
 				nbSpam=Integer.parseInt(args[i+1]);
 			} else if (args[i].equals("-nbHam") && (args.length > i+1)) {
 				nbHam=Integer.parseInt(args[i+1]);
-			} /*else if (args[i].equals("-testNb") && (args.length > i+1)) {
-				testNumber=Integer.parseInt(args[i+1]);
-			}*/
+			} else if (args[i].equals("-testFile") && (args.length > i+1)) {
+				testAll=false;
+				testFile=args[i+1];
+			} else if (args[i].equals("-learnOnly") && (args.length > i)) {
+				testAll=false;
+			}
+		}
+
+		if (chargement) {
+			classifieur=chargement(nomClassifieurChargement);
+		} else {
+			classifieur=new Main();
+			classifieur.apprentissage(nbSpam, nbHam);
+		}
+
+		if (testAll) {
+			classifieur.test(nbSpam,nbHam);
+		} else if (testFile != null) {
+			classifieur.test(testFile);
 		}
 
 		if (sauvegarde) {
-			classifieur=new Main();
-			classifieur.apprentissage(nbSpam, nbHam);
 			sauvegarde(classifieur,nomClassifieurSauvegarde);
-			//classifieur.test(nbSpam,nbHam);
-		} else if (chargement) {
-			classifieur=chargement(nomClassifieurChargement);
-			classifieur.test(nbSpam,nbHam);
 		}
+
 
 		System.out.println("fin");
 	}
@@ -343,7 +371,7 @@ public class Main implements Serializable {
 			fichierSortie.close();
 			System.out.println("Le classififeur a été sauvegardé");
 		} catch (IOException i) {
-			i.printStackTrace();
+			//i.printStackTrace();
 			System.out.println("Il y a eu un problème lors de la sauvegarde");
 		}
 	}
@@ -362,6 +390,7 @@ public class Main implements Serializable {
 			ois.close();
 			fichierEntree.close();
 		} catch (Exception e) {
+			//e.printStackTrace();
 			System.out.println("Erreur lors du chargement");
 			return null;
 		}
